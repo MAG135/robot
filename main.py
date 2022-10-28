@@ -1,13 +1,24 @@
 import logging
+import platform
 
 from algorithms.customization.algorithm_customization import AlgorithmCustomization
 from db import db
 from robot.robot import TikTokRobot
 
-#logging.basicConfig(level = logging.INFO)
+# logging.basicConfig(level = logging.INFO)
 
 if __name__ == "__main__":
-    robot = TikTokRobot("https://www.tiktok.com/", "./robot/chromedriver/chromedriver.exe")
+    chromedriver = ""
+
+    if platform.system() == "Linux":
+        chromedriver = "chromedriver"
+    elif platform.system() == "Windows":
+        chromedriver = "chromedriver.exe"
+    else:
+        raise Exception("Не удалось подобрать драйвер")
+
+    robot = TikTokRobot("https://www.tiktok.com/", f"./robot/chromedriver/{chromedriver}")
+
     db.init()
 
     try:
