@@ -11,6 +11,7 @@ import logging
 import random
 import time
 
+import config.config
 from enums.button_type import ButtonType
 from mapper import mapper
 from models.publication_model import PublicationModel
@@ -34,9 +35,9 @@ class AlgorithmCustomization:
     def step_1_search_by_hashtag(self, hashtag: str):
         self.robot.search_by_hashtags(hashtag)
 
-    def step_2_watch_two_videos_and_like(self, count: int):
+    def step_2_watch_two_videos_and_like(self, publication_num: int):
         print(f"Открываем первое видео")
-        self.robot.open_first_publication(count)
+        self.robot.open_publication(publication_num)
         duration = self.robot.get_video_duration()
         print(f"Смотрим первое видео {duration} секунд")
         time.sleep(duration)
@@ -76,10 +77,14 @@ class AlgorithmCustomization:
             _save(publication)
 
     def start(self):
-        count = 0
+        alg_customization_circle_number = config.config.read_config()['alg_customization_circle_number']
 
         while True:
+            print(f"Круг: {alg_customization_circle_number}")
             hashtags = utils.format_hashtags(utils.get_hashtags_from_file())
+
+            #С какой публикации мы начнем смотреть видео, на странице по хэштегу
+            publication_num = 1 + alg_customization_circle_number * 2
 
             i = 0
             while i != len(hashtags):
@@ -90,12 +95,13 @@ class AlgorithmCustomization:
                     except IndexError:
                         tags_group = [hashtags[i]]
                         i += 1
-
-                    for tag in tags_group:
-                        print(f"Ищем видео по хэштегу {tag}")
-                        self.step_1_search_by_hashtag(tag)
-                        print(f"Начинаем смотреть видео по хэштегу {tag}")
-                        self.step_2_watch_two_videos_and_like(count)
+                    #Проверяем, что получены не все видео по хэштегу (500 макс. видео по тэгу)
+                    if publication_num <= 500:
+                        for tag in tags_group:
+                            print(f"Ищем видео по хэштегу {tag}")
+                            self.step_1_search_by_hashtag(tag)
+                            print(f"Начинаем смотреть видео по хэштегу {tag}")
+                            self.step_2_watch_two_videos_and_like(publication_num)
                     print(f"Идем в ленту рекомендаций")
                     self.step_3_move_to_recommend()
                     print(f"Начинаем смотреть 5 видео")
@@ -103,7 +109,7 @@ class AlgorithmCustomization:
                 except Exception as ex:
                     logging.error(ex, exc_info=True)
                     continue
-            count += 1
+            alg_customization_circle_number = self._inc_circle(alg_customization_circle_number)
 
     def check_blob(self, publication: PublicationModel):
         if publication.video.url.startswith('blob'):
@@ -116,3 +122,13 @@ class AlgorithmCustomization:
                 publication.video.url = url
                 return
             print(f"Не удалось исправить ссылку для публикации {publication.publication_id}")
+
+    def _inc_circle(self, alg_customization_circle_number):
+        alg_customization_circle_number += 1
+
+        config_data = config.config.read_config()
+        config_data['alg_customization_circle_number'] = alg_customization_circle_number
+
+        config.config.update_config(config_data)
+
+        return alg_customization_circle_number

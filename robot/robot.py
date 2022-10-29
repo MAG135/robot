@@ -1,11 +1,10 @@
-import base64
 import time
 
-from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from seleniumwire import webdriver
 
+import config.config
 from enums.button_type import ButtonType
 from utils.utils import convert_str_time_to_seconds
 
@@ -18,10 +17,10 @@ def _get_driver_options():
     options.add_experimental_option('useAutomationExtension', False)
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
 
-    #options.add_argument("--autoplay-policy=no-user-gesture-required")
+    # options.add_argument("--autoplay-policy=no-user-gesture-required")
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_argument("--disable-dev-shm-usage")
-    #options.add_argument("--headless")
+    # options.add_argument("--headless")
     options.add_argument("--no-sandbox")
 
     return options
@@ -29,8 +28,23 @@ def _get_driver_options():
 
 # Вынеcти в main ?
 def _get_seleniumwire_options():
+    options = dict()
+
     # Декодирование тела ответа
-    return {'disable_encoding': True}
+    options['disable_encoding'] = True
+    _proxy(options)
+
+    return options
+
+
+def _proxy(options: dict):
+    config_data = config.config.read_config()
+
+    if config_data['proxy']['enabled']:
+        options['proxy'] = {
+            "https": f"http://{config_data['proxy']['login']}:{config_data['proxy']['password']}@"
+                     f"{config_data['proxy']['host']}:{config_data['proxy']['port']}"
+        }
 
 
 class TikTokRobot:
@@ -73,7 +87,7 @@ class TikTokRobot:
             self.switch_to_new_window()
             # self.driver.find_element(By.CLASS_NAME, "tiktok-q6kzcs-MainDetailWrapper") - когда подает ошибка при открытии профиля
 
-            self.open_first_publication()
+            self.open_publication()
 
             print()
             return
@@ -128,14 +142,31 @@ class TikTokRobot:
     def get_publications_from_main_page(self):
         return self.driver.find_elements(By.CLASS_NAME, "tiktok-1nncbiz-DivItemContainer")
 
+    def get_publications_from_hashtag_page(self):
+        return self.driver.find_elements(By.CLASS_NAME, "tiktok-x6y88p-DivItemContainerV2")
+
     # Открытие первого видео на странице автора, на странице с хэштегами
-    def open_first_publication(self, count=0):
-        try:
-            self.driver.find_elements(By.CLASS_NAME, "tiktok-x6y88p-DivItemContainerV2")[1 + count * 2].click()
-            self.switch_to_new_window()
-        except Exception:
-            print("open_first_publication. Не удалось найти публикации")
-            self.open_first_publication()
+    def open_publication(self, element_num=0):
+        success = False
+
+        while not success:
+            try:
+                publications = self.get_publications_from_hashtag_page()
+
+                print(f"Ищем элемент с номером {element_num}")
+                while element_num > len(publications):
+                    print(f"Элементов на странице {len(publications)}. Скролим")
+                    self.scroll_to_element(publications[-1])
+                    # ждем пока прогурузятся элементы
+                    time.sleep(3)
+                    publications = self.get_publications_from_hashtag_page()
+
+                publications[element_num].click()
+                self.switch_to_new_window()
+
+                success = True
+            except Exception:
+                print("open_first_publication. Не удалось найти публикации")
 
     def get_video_duration(self):
         flag = False
@@ -145,7 +176,8 @@ class TikTokRobot:
         # BUG
         while (not flag) & (attempts != 0):
             try:
-                duration = convert_str_time_to_seconds(self.driver.find_element(By.CLASS_NAME, "tiktok-o2z5xv-DivSeekBarTimeContainer").text.split("/")[1])
+                duration = convert_str_time_to_seconds(
+                    self.driver.find_element(By.CLASS_NAME, "tiktok-o2z5xv-DivSeekBarTimeContainer").text.split("/")[1])
                 flag = True
             except Exception:
                 flag = False
@@ -156,4 +188,3 @@ class TikTokRobot:
 
     def search_by_hashtags(self, hashtag: str):
         self.driver_get_to(f"tag/{hashtag}")
-

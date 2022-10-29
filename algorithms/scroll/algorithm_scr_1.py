@@ -29,7 +29,7 @@ class AlgorithmScroll1(IAlgorithmScroll):
         pass
 
     def step_3_watch_two_videos_and_like(self):
-        self.robot.open_first_publication()
+        self.robot.open_publication()
         # TODO: Добавить delay
         time.sleep(self.publication.video.duration)
         self.robot.press_button(ButtonType.LIKE_IN_PUBLISH)
