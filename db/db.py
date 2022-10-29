@@ -1,12 +1,12 @@
 from peewee import *
 from playhouse.postgres_ext import ArrayField
 
-db = PostgresqlDatabase(database='tiktok', user='postgres', password='password', host='localhost', port='5432')
+tiktok_db = PostgresqlDatabase(database='tiktok', user='postgres', password='password', host='localhost', port='5432')
 
 
 class BaseModel(Model):
     class Meta:
-        database = db
+        database = tiktok_db
 
 
 class VideoEntity(BaseModel):
@@ -34,5 +34,6 @@ class PublicationEntity(BaseModel):
 
 
 def init():
-    VideoEntity.create_table()
-    PublicationEntity.create_table()
+    with tiktok_db:
+        VideoEntity.create_table()
+        PublicationEntity.create_table()

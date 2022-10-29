@@ -16,6 +16,7 @@ from enums.button_type import ButtonType
 from mapper import mapper
 from models.publication_model import PublicationModel
 from parsers import html_parser
+from repositories import publication_repository, video_repository
 from robot.robot import TikTokRobot
 from utils import utils
 
@@ -24,8 +25,8 @@ def _save(publication: PublicationModel):
     video_entity = mapper.to_video_entity(publication.video)
     publication_entity = mapper.to_publication_entity(publication, video_entity)
 
-    video_entity.save()
-    publication_entity.save()
+    video_repository.save(video_entity)
+    publication_repository.save(publication_entity)
 
 
 class AlgorithmCustomization:
