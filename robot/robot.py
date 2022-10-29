@@ -187,4 +187,13 @@ class TikTokRobot:
         return duration
 
     def search_by_hashtags(self, hashtag: str):
-        self.driver_get_to(f"tag/{hashtag}")
+        flag = False
+
+        while not flag:
+            self.driver_get_to(f"tag/{hashtag}")
+
+            try:
+                self.get_publications_from_hashtag_page()
+                flag = True
+            except Exception:
+                print(f"Публикации по хэштегу {hashtag} не прогрузились")
