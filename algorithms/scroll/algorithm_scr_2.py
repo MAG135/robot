@@ -5,10 +5,13 @@
 2) Проверяем есть ли в хэштегах слова из словаря
 ИЛИ Проверяем есть ли в описании слова из словаря
 ИЛИ Проверяем есть автор в нашем списке
+3) Лайк
 """
+import random
 import time
 
 from algorithms.common import IAlgorithmScroll, Algorithm, AlgorithmState, save
+from enums.button_type import ButtonType
 from models.publication_model import PublicationModel
 from robot.robot import TikTokRobot
 from utils.utils import get_key_words, format_words
@@ -27,8 +30,14 @@ class AlgorithmScroll2(IAlgorithmScroll):
 
     def step_2_watching_video(self):
         print(f"Смотрим видео")
-        time.sleep(5) #Время на прогрузку видео
+        time.sleep(5)  # Время на прогрузку видео
         time.sleep(self.publication.video.duration)
+
+    def step_3_like(self):
+        chance = random.randint(1, 10)
+
+        if chance >= 5:
+            self.robot.press_button(ButtonType.LIKE_IN_RECOMMEND)
 
     def start(self, publication: PublicationModel):
         print(f"Стартует Алгоритм_2")
@@ -36,6 +45,7 @@ class AlgorithmScroll2(IAlgorithmScroll):
 
         self.step_1_download()
         self.step_2_watching_video()
+        self.step_3_like()
 
         self.publication = None
 
