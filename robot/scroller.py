@@ -27,17 +27,24 @@ class Scroller:
         while True:
             try:
                 content = self.robot.get_publications_from_main_page()
-                if len(content) == 0:
+                if len(content) == count:
+                    print(f"len(content) == count. {len(content)} == {count}")
                     retry += 1
                     time.sleep(1)
 
                 for i in range(count, len(content)):
                     retry = 0
+                    print("Получаем следующее видео в ленте")
                     self.robot.scroll_to_element(content[i])
 
-                    time.sleep(0.5)  # Чтобы скролл успел отработать
+                    time.sleep(0.8)  # Чтобы скролл успел отработать
 
                     publication_id = html_parser.get_publication_id(content[i])
+                    if publication_id == -1:
+                        print(f"publication_id == -1. Пробуем еще через 3 секунды")
+                        time.sleep(3)
+                        publication_id = html_parser.get_publication_id(content[i])
+                        print(publication_id)
 
                     if publication_id in recommend_publications_dict:
                         publication = recommend_publications_dict[publication_id]
@@ -58,6 +65,7 @@ class Scroller:
                     time.sleep(random.randint(4, 10))
 
                 if retry == 15:
+                    print(f"retry == 15")
                     self._revive()
                     retry = 0
                     continue

@@ -45,7 +45,8 @@ class AlgorithmScroll2(IAlgorithmScroll):
 
         self.step_1_download()
         self.step_2_watching_video()
-        self.step_3_like()
+        #TODO: Ломается скролл
+        #self.step_3_like()
 
         self.publication = None
 
