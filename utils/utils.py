@@ -37,3 +37,21 @@ def format_hashtags(hashtags: list[str]):
             formatted_tags.append(tag.replace(" ", ""))
 
     return formatted_tags
+
+
+def get_key_words():
+    with open('./dictionary.txt', 'r') as f:
+        worlds = f.readlines()
+        worlds = [word.rstrip() for word in worlds]
+
+    return worlds
+
+
+def format_words(words: list[str]):
+    formatted_words = list()
+
+    for word in words:
+        if word != '':
+            formatted_words.append(word.replace(" ", ""))
+
+    return formatted_words

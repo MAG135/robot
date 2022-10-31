@@ -1,20 +1,30 @@
 from algorithms.common import IAlgorithmScroll, Algorithm
+from algorithms.scroll import algorithm_scr_2
 from models.publication_model import PublicationModel
+
+
+def check_terms_for_algorithm_1():
+    return False
+
+
+def check_terms_for_algorithm_2(publication: PublicationModel):
+    if algorithm_scr_2.analysis_hashtags(publication.hashtags) \
+            or algorithm_scr_2.analysis_decs(publication.desc) \
+            or algorithm_scr_2.analysis_author(publication.author_unique_id):
+        return Algorithm.ALGORITHM_2
+
+    return False
 
 
 class Handler:
     def __init__(self, algorithms: list[IAlgorithmScroll]):
         self.algorithms = algorithms
 
-    def check_terms_for_algorithm_1(self):
-        if True:
-            return Algorithm.ALGORITHM_1
-        return None
-
     def handle(self, publication: PublicationModel):
         alg_check_list = list()
 
-        alg_check_list.append(self.check_terms_for_algorithm_1())
+        # alg_check_list.append(self.check_terms_for_algorithm_1())
+        alg_check_list.append(check_terms_for_algorithm_2(publication))
 
         alg_check_entities = list()
 

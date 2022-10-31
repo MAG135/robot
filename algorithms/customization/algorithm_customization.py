@@ -12,21 +12,12 @@ import random
 import time
 
 import config.config
+from algorithms.common import save
 from enums.button_type import ButtonType
-from mapper import mapper
 from models.publication_model import PublicationModel
 from parsers import html_parser
-from repositories import publication_repository, video_repository
 from robot.robot import TikTokRobot
 from utils import utils
-
-
-def _save(publication: PublicationModel):
-    video_entity = mapper.to_video_entity(publication.video)
-    publication_entity = mapper.to_publication_entity(publication, video_entity)
-
-    video_repository.save(video_entity)
-    publication_repository.save(publication_entity)
 
 
 class AlgorithmCustomization:
@@ -75,7 +66,7 @@ class AlgorithmCustomization:
             self.check_blob(publication)
 
             print(f"Сохраняем информацию о публикации {publication.publication_id} в базу")
-            _save(publication)
+            save(publication)
 
     def start(self):
         alg_customization_circle_number = config.config.read_config()['alg_customization_circle_number']
@@ -84,7 +75,7 @@ class AlgorithmCustomization:
             print(f"Круг: {alg_customization_circle_number}")
             hashtags = utils.format_hashtags(utils.get_hashtags_from_file())
 
-            #С какой публикации мы начнем смотреть видео, на странице по хэштегу
+            # С какой публикации мы начнем смотреть видео, на странице по хэштегу
             publication_num = 1 + alg_customization_circle_number * 2
 
             i = 0
@@ -96,7 +87,7 @@ class AlgorithmCustomization:
                     except IndexError:
                         tags_group = [hashtags[i]]
                         i += 1
-                    #Проверяем, что получены не все видео по хэштегу (500 макс. видео по тэгу)
+                    # Проверяем, что получены не все видео по хэштегу (500 макс. видео по тэгу)
                     if publication_num <= 500:
                         for tag in tags_group:
                             print(f"Ищем видео по хэштегу {tag}")

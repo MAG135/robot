@@ -1,8 +1,11 @@
+from mapper import mapper
 from models.publication_model import PublicationModel
+from repositories import video_repository, publication_repository
 
 
 class Algorithm:
     ALGORITHM_1 = "algorithm_1"
+    ALGORITHM_2 = "algorithm_2"
 
 
 """
@@ -37,3 +40,11 @@ class IAlgorithmScroll:
 
     def get_name(self):
         pass
+
+
+def save(publication: PublicationModel):
+    video_entity = mapper.to_video_entity(publication.video)
+    publication_entity = mapper.to_publication_entity(publication, video_entity)
+
+    video_repository.save(video_entity)
+    publication_repository.save(publication_entity)

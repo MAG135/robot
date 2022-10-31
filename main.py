@@ -2,10 +2,14 @@ import logging
 import platform
 
 from algorithms.customization.algorithm_customization import AlgorithmCustomization
+from algorithms.handlers import Handler
+from algorithms.scroll.algorithm_scr_1 import AlgorithmScroll1
+from algorithms.scroll.algorithm_scr_2 import AlgorithmScroll2
 from db import db
 from robot.robot import TikTokRobot
 
 # logging.basicConfig(level = logging.INFO)
+from robot.scroller import Scroller
 
 if __name__ == "__main__":
     chromedriver = ""
@@ -27,17 +31,17 @@ if __name__ == "__main__":
         print("Окно браузера сделайте активным")
 
         # Инициализация скроллера с алгоритмами
-        # algs = list()
-        # algs.append(AlgorithmScroll1(robot))
-        # handler = Handler(algs)
-        # scroller = Scroller(robot, handler)
-        # scroller.start()
+        algs = list()
+        algs.append(AlgorithmScroll2(robot))
+        handler = Handler(algs)
+        scroller = Scroller(robot, handler)
+        scroller.start()
 
-        a = AlgorithmCustomization(robot)
-        try:
-            a.start()
-        except Exception as ex:
-            print(ex.__traceback__)
+        # a = AlgorithmCustomization(robot)
+        # try:
+        #     a.start()
+        # except Exception as ex:
+        #     print(ex.__traceback__)
 
     except Exception as ex:
         logging.error(ex, exc_info=True)
