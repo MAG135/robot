@@ -35,47 +35,113 @@ def get_publication_info(item: str):
 
 
 def get_desc(item):
-    return item['desc']
+    desc = ''
+
+    try:
+        desc = item['desc']
+    except Exception:
+        print(f"Не удалось получить описание видео")
+
+    return desc
 
 
 def get_author_unique_id(item):
-    return item['author']['uniqueId']
+    author_unique_id = ''
+
+    try:
+        author_unique_id = item['author']['uniqueId']
+    except Exception:
+        print(f"Не удалось получить идентификатор автора")
+
+    return author_unique_id
 
 
 def get_like_count(item):
-    return item['stats']['diggCount']
+    like_count = -1
+
+    try:
+        like_count = item['stats']['diggCount']
+    except Exception:
+        print(f"Не удалось получить количество лайков")
+
+    return like_count
 
 
 def get_comment_count(item):
-    return item['stats']['commentCount']
+    comment_count = -1
+
+    try:
+        comment_count = item['stats']['commentCount']
+    except Exception:
+        print(f"Не удалось получить количество комментариев")
+
+    return comment_count
 
 
 def get_share_count(item):
-    return item['stats']['shareCount']
+    share_count = -1
+    
+    try:
+        share_count = item['stats']['shareCount']
+    except Exception:
+        print(f"Не удалось получить количество репостов")
+    
+    return share_count
 
 
 def get_publication_id(item):
-    return item['id']
+    publication_id = -1
+
+    try:
+        publication_id = item['id']
+    except Exception:
+        print(f"Не удалось получить идентификатор публикации")
+
+    return publication_id
 
 
 def get_video_url(item):
-    return item['video']['downloadAddr']
+    video_url = -1
+
+    try:
+        video_url = item['video']['downloadAddr']
+    except Exception:
+        print(f"Не удалось получить url видео")
+
+    return video_url
 
 
 def get_hashtags(item):
     hashtags = list()
 
-    if 'textExtra' in item:
-        hashtags = [t['hashtagName'] for t in item['textExtra']]
-    elif 'challenges' in item:
-        hashtags = [t['title'] for t in item['challenges']]
+    try:
+        if 'textExtra' in item:
+            hashtags = [t['hashtagName'] for t in item['textExtra']]
+        elif 'challenges' in item:
+            hashtags = [t['title'] for t in item['challenges']]
+    except Exception:
+        print(f"Не удалось получить хэштеги")
 
     return hashtags
 
 
 def get_duration(item):
-    return item['video']['duration']
+    duration = 0
+
+    try:
+        duration = item['video']['duration']
+    except Exception:
+        print(f"Не удалось получить продолжительность видео")
+
+    return duration
 
 
 def get_view_count(item):
-    return item['stats']['playCount']
+    view_count = -1
+
+    try:
+        view_count = item['stats']['playCount']
+    except Exception:
+        print(f"Не удалось получить количество просмотров")
+
+    return view_count

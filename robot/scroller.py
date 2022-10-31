@@ -48,7 +48,7 @@ class Scroller:
                 time.sleep(random.randint(1, 2))
 
             # TODO подумать куда это вынести
-            print(f"Получаем новые новые из ленты")
+            print(f"Получаем новые видео из ленты")
             responses = self.robot.get_recommend_videos()
             self.robot.del_requests_history()
 
