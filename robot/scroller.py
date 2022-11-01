@@ -2,6 +2,8 @@ import random
 import time
 import traceback
 
+import selenium.common.exceptions
+
 import parsers.html_parser as html_parser
 import parsers.response_parser as response_parser
 from algorithms.common import AlgorithmState
@@ -68,6 +70,7 @@ class Scroller:
                     print(f"retry == 15")
                     self._revive()
                     retry = 0
+                    count = 0
                     continue
 
                 # TODO подумать куда это вынести
@@ -92,4 +95,12 @@ class Scroller:
                 continue
 
     def _revive(self):
-        self.robot.driver_get_to("")
+        r = False
+
+        while not r:
+            try:
+                self.robot.driver_get_to("")
+                r = True
+            except selenium.common.exceptions.TimeoutException:
+                print("Получили исключение по таймауту. Спим 3 минуты")
+                time.sleep(180)
