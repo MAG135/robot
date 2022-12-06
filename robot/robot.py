@@ -6,6 +6,7 @@ from seleniumwire import webdriver
 
 import config.config
 from enums.button_type import ButtonType
+from utils import utils
 from utils.utils import convert_str_time_to_seconds
 
 BASE_ULR = "http://tiktok.com/"
@@ -117,6 +118,14 @@ class TikTokRobot:
     def driver_get_to(self, to: str):
         self.driver.get(f"{BASE_ULR}{to}")
 
+    #Проверка, появилась ли капча
+    def check_captcha(self):
+        try:
+            c = self.driver.find_element(By.CLASS_NAME, "captcha_verify_container")
+            return True
+        except Exception:
+            return False
+
     def get_url_by_key(self, key: str):
         requests = self.driver.requests
 
@@ -142,8 +151,23 @@ class TikTokRobot:
     def get_publications_from_main_page(self):
         return self.driver.find_elements(By.CLASS_NAME, "tiktok-1nncbiz-DivItemContainer")
 
-    def get_publications_from_hashtag_page(self):
+    def get_publications_from_page(self):
         return self.driver.find_elements(By.CLASS_NAME, "tiktok-x6y88p-DivItemContainerV2")
+
+    def get_publication_url_from_element(self, publication_element: WebElement):
+        return publication_element.find_element(By.CLASS_NAME, "tiktok-yz6ijl-DivWrapper")\
+            .find_element(By.TAG_NAME, "a").get_attribute("href")
+
+    def get_publication_id_from_element(self, publication_element: WebElement):
+        return utils.get_publication_id_from_url(self.get_publication_url_from_element(publication_element))
+
+    def get_publication_hashtags_author_page(self, publication: WebElement):
+        hashtags = list()
+
+        tags = publication.find_elements(By.CLASS_NAME, "tiktok-q3q1i1-StyledCommonLink")
+
+        for tag in tags:
+            hashtags.append(tag.find_element(By.CLASS_NAME, "tiktok-f9vo34-StrongText").text.replace("#", ""))
 
     # Открытие первого видео на странице автора, на странице с хэштегами
     def open_publication(self, element_num=0):
@@ -151,7 +175,7 @@ class TikTokRobot:
 
         while not success:
             try:
-                publications = self.get_publications_from_hashtag_page()
+                publications = self.get_publications_from_page()
 
                 print(f"Ищем элемент с номером {element_num}")
                 while element_num > len(publications):
@@ -159,7 +183,7 @@ class TikTokRobot:
                     self.scroll_to_element(publications[-1])
                     # ждем пока прогурузятся элементы
                     time.sleep(3)
-                    publications = self.get_publications_from_hashtag_page()
+                    publications = self.get_publications_from_page()
 
                 publications[element_num].click()
                 self.switch_to_new_window()
@@ -193,7 +217,7 @@ class TikTokRobot:
             self.driver_get_to(f"tag/{hashtag}")
 
             try:
-                self.get_publications_from_hashtag_page()
+                self.get_publications_from_page()
                 flag = True
             except Exception:
                 print(f"Публикации по хэштегу {hashtag} не прогрузились")

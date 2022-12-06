@@ -1,15 +1,11 @@
 import logging
 import platform
 
-from algorithms.customization.algorithm_customization import AlgorithmCustomization
-from algorithms.handlers import Handler
-from algorithms.scroll.algorithm_scr_1 import AlgorithmScroll1
-from algorithms.scroll.algorithm_scr_2 import AlgorithmScroll2
+from algorithms.algorithm_scr_3 import AlgorithmScroll3
 from db import db
 from robot.robot import TikTokRobot
 
 # logging.basicConfig(level = logging.INFO)
-from robot.scroller import Scroller
 
 if __name__ == "__main__":
     chromedriver = ""
@@ -26,22 +22,28 @@ if __name__ == "__main__":
     db.init()
 
     try:
-        robot.start()
-        input("После аутентификации перейдите в ленту рекомендаций. В консоли нажмите Enter")
-        print("Окно браузера сделайте активным")
+        # robot.start()
+        AlgorithmScroll3(robot).start()
 
-        # Инициализация скроллера с алгоритмами
-        algs = list()
-        algs.append(AlgorithmScroll2(robot))
-        handler = Handler(algs)
-        scroller = Scroller(robot, handler)
-        scroller.start()
+    # author.add_authors(utils.format_author(utils.get_author()))
+    # author.get_last_publication_id("videos1")
 
-        # a = AlgorithmCustomization(robot)
-        # try:
-        #     a.start()
-        # except Exception as ex:
-        #     print(ex.__traceback__)
+    # TODO: ЗАПУСК АЛГОРИТМА ПО СКРОЛЛИНГУ ЛЕНТЫ С ХЭШТЕГАМИ
+    # input("После аутентификации перейдите в ленту рекомендаций. В консоли нажмите Enter")
+    # print("Окно браузера сделайте активным")
+    #
+    # # Инициализация скроллера с алгоритмами
+    # algs = list()
+    # algs.append(AlgorithmScroll2(robot))
+    # handler = Handler(algs)
+    # scroller = Scroller(robot, handler)
+    # scroller.start()
+
+    # a = AlgorithmCustomization(robot)
+    # try:
+    #     a.start()
+    # except Exception as ex:
+    #     print(ex.__traceback__)
 
     except Exception as ex:
         logging.error(ex, exc_info=True)

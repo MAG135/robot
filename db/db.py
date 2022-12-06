@@ -18,22 +18,31 @@ class VideoEntity(BaseModel):
 
 
 class PublicationEntity(BaseModel):
-    publication_id = TextField()
-    publication_url = TextField()
-    author_unique_id = TextField()
-    desc = TextField()
-    like_count = IntegerField()
-    comment_count = IntegerField()
-    view_count = IntegerField()
-    share_count = IntegerField()
-    hashtags = ArrayField(TextField, index=False)
-    video = ForeignKeyField(VideoEntity, backref="publication", unique=True)
+    publication_id = TextField(null=True)
+    publication_url = TextField(null=True)
+    author_unique_id = TextField(null=True)
+    desc = TextField(null=True)
+    like_count = IntegerField(null=True)
+    comment_count = IntegerField(null=True)
+    view_count = IntegerField(null=True)
+    share_count = IntegerField(null=True)
+    hashtags = ArrayField(TextField, index=False, null=True)
+    video = ForeignKeyField(VideoEntity, backref="publication", unique=True, null=True)
 
     class Meta:
         db_table = "publication"
+
+
+class AuthorEntity(BaseModel):
+    author_id = TextField()
+    last_publication_id = TextField()
+
+    class Meta:
+        db_table = "author"
 
 
 def init():
     with tiktok_db:
         VideoEntity.create_table()
         PublicationEntity.create_table()
+        AuthorEntity.create_table()

@@ -55,3 +55,25 @@ def format_words(words: list[str]):
             formatted_words.append(word.replace(" ", ""))
 
     return formatted_words
+
+
+def get_author():
+    with open('./authors.txt', 'r') as f:
+        authors = f.readlines()
+        authors = [author.rstrip() for author in authors]
+
+    return authors
+
+
+def format_author(authors: list[str]):
+    formatted_authors = list()
+
+    for author in authors:
+        if author != '':
+            formatted_authors.append(author.replace(" ", ""))
+
+    return formatted_authors
+
+
+def get_publication_id_from_url(url: str):
+    return url.split("/")[-1]
