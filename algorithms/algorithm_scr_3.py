@@ -98,7 +98,7 @@ class AlgorithmScroll3:
                     print(f"Найдено публикаций {len(new_publications)}")
 
                     if len(new_publications) != 0:
-                        print(f"Последния публикация {new_publications[0]}")
+                        print(f"Последния публикация {self.robot.get_publication_url_from_element(new_publications[0])}")
                         print(f"Извлекаем id публикации")
                         author_repository.update_last_publication_id(
                             author, self.robot.get_publication_id_from_element(new_publications[0]))
