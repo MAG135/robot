@@ -20,7 +20,7 @@ def generate_publication_url(authorUniqueId, publication_id):
 
 
 def get_hashtags_from_file():
-    with open('./hashtags.txt', 'r') as f:
+    with open('./files/hashtags.txt', 'r') as f:
         hashtags = f.readlines()
         hashtags = [tag.rstrip() for tag in hashtags]
 
@@ -40,7 +40,7 @@ def format_hashtags(hashtags: list[str]):
 
 
 def get_key_words():
-    with open('./dictionary.txt', 'r') as f:
+    with open('./files/dictionary.txt', 'r') as f:
         worlds = f.readlines()
         worlds = [word.rstrip() for word in worlds]
 
@@ -57,8 +57,8 @@ def format_words(words: list[str]):
     return formatted_words
 
 
-def get_author():
-    with open('./authors.txt', 'r') as f:
+def get_authors(category: str):
+    with open(f'./files/authors_{category}.txt', 'r') as f:
         authors = f.readlines()
         authors = [author.rstrip() for author in authors]
 

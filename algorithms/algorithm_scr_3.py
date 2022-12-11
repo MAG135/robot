@@ -14,9 +14,10 @@ from selenium.webdriver.remote.webelement import WebElement
 
 import utils.utils
 from db.db import PublicationEntity
+from enums.publication_category import PublicationCategory
 from repositories import author_repository, publication_repository
 from robot.robot import TikTokRobot
-from utils.utils import get_key_words, format_words, format_author, get_author
+from utils.utils import get_key_words, format_words, format_author, get_authors
 
 
 class AlgorithmScroll3:
@@ -66,7 +67,7 @@ class AlgorithmScroll3:
 
         return best_publication
 
-    def step_4_download(self, author: str, publications: list[WebElement]):
+    def step_4_download(self, author: str, category: str, publications: list[WebElement]):
         print(f"Сохраняем публикации в БД")
         for p in publications:
             publication_repository.save(PublicationEntity(
@@ -75,6 +76,8 @@ class AlgorithmScroll3:
                 author_unique_id=author,
                 # decs=html_parser.get_desc(p), #TODO: это будет работать????
                 # view_count= TODO: дописать парсер
+                category=category,
+                created_at=int(time.time()),
                 hashtags=self.robot.get_publication_hashtags_author_page(p))
             )
 
@@ -84,26 +87,31 @@ class AlgorithmScroll3:
             try:
                 start_time = time.time()
 
-                authors = format_author(get_author())
+                for category in list(PublicationCategory):
 
-                author_repository.add_authors(authors)
+                    print(f"Смотрим категорию: {category.name}")
 
-                for author in authors:
-                    self.step_1_go_to_author(author)
+                    authors = format_author(get_authors(category.name.lower()))
 
-                    last_publication = author_repository.get_last_publication_id(author)
-                    print(f"Последняя публикация {author} : {last_publication}")
-                    new_publications = self.step_2_get_new_videos(last_publication)
+                    author_repository.add_authors(authors, category.value)
 
-                    print(f"Найдено публикаций {len(new_publications)}")
+                    for author in authors:
+                        self.step_1_go_to_author(author)
 
-                    if len(new_publications) != 0:
-                        print(f"Последния публикация {self.robot.get_publication_url_from_element(new_publications[0])}")
-                        print(f"Извлекаем id публикации")
-                        author_repository.update_last_publication_id(
-                            author, self.robot.get_publication_id_from_element(new_publications[0]))
+                        last_publication = author_repository.get_last_publication_id(author, category.value)
+                        print(f"Последняя публикация {author} : {last_publication}")
+                        new_publications = self.step_2_get_new_videos(last_publication)
 
-                    self.step_4_download(author, self.step_3_analysis_hashtags(new_publications))
+                        print(f"Найдено публикаций {len(new_publications)}")
+
+                        if len(new_publications) != 0:
+                            print(
+                                f"Последния публикация {self.robot.get_publication_url_from_element(new_publications[0])}")
+                            print(f"Извлекаем id публикации")
+                            author_repository.update_last_publication_id(
+                                author, self.robot.get_publication_id_from_element(new_publications[0]), category.value)
+
+                        self.step_4_download(author, category.value, self.step_3_analysis_hashtags(new_publications))
 
                 end_time = time.time()
 

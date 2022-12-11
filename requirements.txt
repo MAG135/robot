@@ -9,6 +9,17 @@ exceptiongroup==1.0.0rc9
 future==0.18.2
 h11==0.14.0
 h2==4.1.0
+hpack==4.0.0
+hyperframe==6.0.1
+idna==3.4
+kaitaistruct==0.10
+outcome==1.2.0
+peewee==3.15.3
+pefile==2021.9.3
+psycopg2==2.9.4
+psycopg2-binary==2.9.4
+pyasn1==0.4.8
+pycparser==2.21
 pydivert==2.1.0
 pyOpenSSL==22.0.0
 pyparsing==3.0.9

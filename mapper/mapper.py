@@ -16,5 +16,7 @@ def to_publication_entity(publication: PublicationModel, video_entity: VideoEnti
                              comment_count=publication.comment_count,
                              view_count=publication.view_count,
                              share_count=publication.share_count,
+                             category=publication.category,
+                             created_at=publication.created_at,
                              hashtags=publication.hashtags,
                              video=video_entity)
