@@ -22,13 +22,16 @@ if __name__ == "__main__":
     db.init()
 
     try:
-        # robot.start()
         AlgorithmScroll3(robot).start()
+    except Exception as ex:
+        logging.error(ex, exc_info=True)
+    finally:
+        robot.stop()
 
-    # author.add_authors(utils.format_author(utils.get_author()))
-    # author.get_last_publication_id("videos1")
 
-    # TODO: ЗАПУСК АЛГОРИТМА ПО СКРОЛЛИНГУ ЛЕНТЫ С ХЭШТЕГАМИ
+# ЗАПУСК АЛГОРИТМА ПО СКРОЛЛИНГУ ЛЕНТЫ С ХЭШТЕГАМИ
+def alg_scroll_with_hashatgs_start():
+    # robot.start()
     # input("После аутентификации перейдите в ленту рекомендаций. В консоли нажмите Enter")
     # print("Окно браузера сделайте активным")
     #
@@ -38,14 +41,10 @@ if __name__ == "__main__":
     # handler = Handler(algs)
     # scroller = Scroller(robot, handler)
     # scroller.start()
-
+    #
     # a = AlgorithmCustomization(robot)
     # try:
     #     a.start()
     # except Exception as ex:
     #     print(ex.__traceback__)
-
-    except Exception as ex:
-        logging.error(ex, exc_info=True)
-    finally:
-        robot.stop()
+    pass

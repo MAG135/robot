@@ -96,22 +96,26 @@ class AlgorithmScroll3:
                     author_repository.add_authors(authors, category.value)
 
                     for author in authors:
-                        self.step_1_go_to_author(author)
+                        try:
+                            self.step_1_go_to_author(author)
 
-                        last_publication = author_repository.get_last_publication_id(author, category.value)
-                        print(f"Последняя публикация {author} : {last_publication}")
-                        new_publications = self.step_2_get_new_videos(last_publication)
+                            last_publication = author_repository.get_last_publication_id(author, category.value)
+                            print(f"Последняя публикация {author} : {last_publication}")
+                            new_publications = self.step_2_get_new_videos(last_publication)
 
-                        print(f"Найдено публикаций {len(new_publications)}")
+                            print(f"Найдено публикаций {len(new_publications)}")
 
-                        if len(new_publications) != 0:
-                            print(
-                                f"Последния публикация {self.robot.get_publication_url_from_element(new_publications[0])}")
-                            print(f"Извлекаем id публикации")
-                            author_repository.update_last_publication_id(
-                                author, self.robot.get_publication_id_from_element(new_publications[0]), category.value)
+                            if len(new_publications) != 0:
+                                print(
+                                    f"Последния публикация {self.robot.get_publication_url_from_element(new_publications[0])}")
+                                print(f"Извлекаем id публикации")
+                                author_repository.update_last_publication_id(
+                                    author, self.robot.get_publication_id_from_element(new_publications[0]), category.value)
 
-                        self.step_4_download(author, category.value, self.step_3_analysis_hashtags(new_publications))
+                            self.step_4_download(author, category.value, self.step_3_analysis_hashtags(new_publications))
+                        except Exception as ex:
+                            print(f"Упали при работе с {author}")
+                            print(traceback.format_exc())
 
                 end_time = time.time()
 
