@@ -38,3 +38,24 @@ def get_last_publication_id(author_id: str, category: int):
         db.tiktok_db.connect(reuse_if_open=True)
         author = AuthorEntity.get((AuthorEntity.author_id == author_id) & (AuthorEntity.category == category))
         return author.last_publication_id
+
+
+def get_all_authors():
+    with db.tiktok_db:
+        db.tiktok_db.connect(reuse_if_open=True)
+
+        resp = AuthorEntity.select()
+
+        authors = list()
+        for a in resp:
+            authors.append(a)
+
+        return authors
+
+
+def set_is_working(author: str, is_working: bool):
+    with db.tiktok_db:
+        db.tiktok_db.connect(reuse_if_open=True)
+        author = AuthorEntity.get(AuthorEntity.author_id == author)
+        author.is_working = is_working
+        author.save()

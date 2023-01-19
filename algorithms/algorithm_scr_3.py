@@ -14,10 +14,9 @@ from selenium.webdriver.remote.webelement import WebElement
 
 import utils.utils
 from db.db import PublicationEntity
-from enums.publication_category import PublicationCategory
 from repositories import author_repository, publication_repository
 from robot.robot import TikTokRobot
-from utils.utils import get_key_words, format_words, format_author, get_authors
+from utils.utils import get_key_words, format_words
 
 
 class AlgorithmScroll3:
@@ -85,48 +84,38 @@ class AlgorithmScroll3:
 
         while True:
             try:
-                start_time = time.time()
+                authors = mix_authors_list(author_repository.get_all_authors())
 
-                for category in list(PublicationCategory):
+                for i, author in enumerate(authors):
+                    author_repository.set_is_working(author.author_id, True)
 
-                    print(f"Смотрим категорию: {category.name}")
+                    self.step_1_go_to_author(author.author_id)
 
-                    authors = format_author(get_authors(category.name.lower()))
+                    print(f"Последняя публикация {author.author_id} : {author.last_publication_id}")
+                    new_publications = self.step_2_get_new_videos(author.last_publication_id)
 
-                    author_repository.add_authors(authors, category.value)
+                    print(f"Найдено публикаций {len(new_publications)}")
 
-                    for author in authors:
-                        try:
-                            self.step_1_go_to_author(author)
+                    if len(new_publications) != 0:
+                        print(
+                            f"Последния публикация {self.robot.get_publication_url_from_element(new_publications[0])}")
+                        print(f"Извлекаем id публикации")
+                        author_repository.update_last_publication_id(
+                            author.author_id, self.robot.get_publication_id_from_element(new_publications[0]),
+                            author.category)
 
-                            last_publication = author_repository.get_last_publication_id(author, category.value)
-                            print(f"Последняя публикация {author} : {last_publication}")
-                            new_publications = self.step_2_get_new_videos(last_publication)
+                    self.step_4_download(author.author_id, author.category,
+                                         self.step_3_analysis_hashtags(new_publications))
 
-                            print(f"Найдено публикаций {len(new_publications)}")
-
-                            if len(new_publications) != 0:
-                                print(
-                                    f"Последния публикация {self.robot.get_publication_url_from_element(new_publications[0])}")
-                                print(f"Извлекаем id публикации")
-                                author_repository.update_last_publication_id(
-                                    author, self.robot.get_publication_id_from_element(new_publications[0]), category.value)
-
-                            self.step_4_download(author, category.value, self.step_3_analysis_hashtags(new_publications))
-                        except Exception as ex:
-                            print(f"Упали при работе с {author}")
-                            print(traceback.format_exc())
-
-                end_time = time.time()
+                    author_repository.set_is_working(author.author_id, False)
 
                 sleep = 2 * 60 * 60
 
-                print(f"Закончили цикл просмотра аккаунтов. Потрачено минут: {(end_time - start_time) / 60}. Спим 2 часа")
                 time.sleep(sleep)
-
             except Exception as ex:
                 print(f"Алгоритм 3. Упали в основном цикле")
                 print(traceback.format_exc())
+                return
 
 
 def analysis_hashtags(hashtags: list[str]):
@@ -167,3 +156,13 @@ def check_last_publication(url: str, last_publication: str):
         return True
 
     return False
+
+
+# Ставим автора на котором закончили в начало
+def mix_authors_list(authors):
+    k = 0
+    for i, a in enumerate(authors):
+        if a.is_working:
+            k = i
+            break
+    return authors[k:] + authors[:k]

@@ -39,6 +39,7 @@ class AuthorEntity(BaseModel):
     author_id = TextField()
     last_publication_id = TextField()
     category = IntegerField()
+    is_working = BooleanField()
 
     class Meta:
         db_table = "author"

@@ -1,5 +1,6 @@
 import logging
 import platform
+import time
 
 from algorithms.algorithm_scr_3 import AlgorithmScroll3
 from db import db
@@ -21,12 +22,15 @@ if __name__ == "__main__":
 
     db.init()
 
-    try:
-        AlgorithmScroll3(robot).start()
-    except Exception as ex:
-        logging.error(ex, exc_info=True)
-    finally:
-        robot.stop()
+    while True:
+        try:
+            AlgorithmScroll3(robot).start()
+        except Exception as ex:
+            logging.error(ex, exc_info=True)
+        finally:
+            robot.stop()
+            print("Закрыли браузер. Спим 5 минут!")
+            time.sleep(5 * 60)
 
 
 # ЗАПУСК АЛГОРИТМА ПО СКРОЛЛИНГУ ЛЕНТЫ С ХЭШТЕГАМИ
