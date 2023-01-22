@@ -18,11 +18,11 @@ if __name__ == "__main__":
     else:
         raise Exception("Не удалось подобрать драйвер")
 
-    robot = TikTokRobot("https://www.tiktok.com/", f"./robot/chromedriver/{chromedriver}")
-
     db.init()
 
     while True:
+        robot = TikTokRobot("https://www.tiktok.com/", f"./robot/chromedriver/{chromedriver}")
+
         try:
             AlgorithmScroll3(robot).start()
         except Exception as ex:
@@ -30,7 +30,7 @@ if __name__ == "__main__":
         finally:
             robot.stop()
             print("Закрыли браузер. Спим 5 минут!")
-            time.sleep(5 * 60)
+            time.sleep(5)
 
 
 # ЗАПУСК АЛГОРИТМА ПО СКРОЛЛИНГУ ЛЕНТЫ С ХЭШТЕГАМИ
