@@ -14,6 +14,7 @@ from selenium.webdriver.remote.webelement import WebElement
 
 import utils.utils
 from db.db import PublicationEntity
+from enums.publication_category import PublicationCategory
 from repositories import author_repository, publication_repository
 from robot.robot import TikTokRobot
 from utils.utils import get_key_words, format_words
@@ -83,8 +84,10 @@ class AlgorithmScroll3:
     def start(self):
 
         while True:
+            update_authors()
+
             try:
-                authors = mix_authors_list(author_repository.get_all_authors())
+                authors = mix_authors_list(author_repository.get_all_authors_without_deleted())
 
                 for i, author in enumerate(authors):
                     author_repository.set_is_working(author.author_id, True)
@@ -166,3 +169,10 @@ def mix_authors_list(authors):
             k = i
             break
     return authors[k:] + authors[:k]
+
+
+def update_authors():
+    for c in list(PublicationCategory):
+        author_repository.add_authors(utils.utils.get_authors(c.name.lower()), c.value)
+
+

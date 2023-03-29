@@ -25,6 +25,14 @@ def add_authors(authors: list[str], category: int):
             AuthorEntity(author_id=a, last_publication_id='', category=category).save()
 
 
+def remove_authors(authors: list[str], category: int):
+    with db.tiktok_db:
+        db.tiktok_db.connect(reuse_if_open=True)
+
+        AuthorEntity.delete().where(
+            (AuthorEntity.author_id.not_in(authors)) & (AuthorEntity.category == category))
+
+
 def update_last_publication_id(author_id: str, last_publication_id: str, category: int):
     with db.tiktok_db:
         db.tiktok_db.connect(reuse_if_open=True)
@@ -53,9 +61,30 @@ def get_all_authors():
         return authors
 
 
+def get_all_authors_without_deleted():
+    with db.tiktok_db:
+        db.tiktok_db.connect(reuse_if_open=True)
+
+        resp = AuthorEntity.select().where(AuthorEntity.is_deleted == False)
+
+        authors = list()
+        for a in resp:
+            authors.append(a)
+
+        return authors
+
+
 def set_is_working(author: str, is_working: bool):
     with db.tiktok_db:
         db.tiktok_db.connect(reuse_if_open=True)
         author = AuthorEntity.get(AuthorEntity.author_id == author)
         author.is_working = is_working
+        author.save()
+
+
+def set_is_deleted(author: str, is_deleted: bool):
+    with db.tiktok_db:
+        db.tiktok_db.connect(reuse_if_open=True)
+        author = AuthorEntity.get(AuthorEntity.author_id == author)
+        author.is_deleted = is_deleted
         author.save()

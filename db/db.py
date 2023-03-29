@@ -40,6 +40,7 @@ class AuthorEntity(BaseModel):
     last_publication_id = TextField()
     category = IntegerField()
     is_working = BooleanField()
+    is_deleted = BooleanField()
 
     class Meta:
         db_table = "author"
